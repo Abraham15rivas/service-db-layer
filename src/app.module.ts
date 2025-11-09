@@ -3,6 +3,7 @@ import { ConfigModule } from '@nestjs/config';
 import { envSchema } from 'config/env-schema.config';
 import { UsersModule } from './users/users.module';
 import { DatabaseModule } from './shared/db/database.module';
+import { WalletsModule } from './wallets/wallets.module';
 import appConfig from '../config/app.config';
 import databaseConfig from '../config/database.config';
 
@@ -15,7 +16,8 @@ import databaseConfig from '../config/database.config';
       validationSchema: envSchema
     }),
     DatabaseModule,
-    UsersModule
+    UsersModule,
+    WalletsModule
   ]
 })
 export class AppModule {}
