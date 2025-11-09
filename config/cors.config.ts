@@ -17,13 +17,13 @@ const configureCors = (app: INestApplication, allowedOrigins: string[], environm
   const corsOptions: CorsOptions = {
     origin: (origin, callback) => {
       if (!origin) {
-          if (environment === 'development') {
+        if (environment === 'development') {
           logger.warn('Solicitud recibida sin origen definido')
           return callback(null, true)
         }
 
         logger.error('Solicitud recibida sin origen definido')
-        return callback(new BadRequestException('No se permiten solicitudes sin origen'), false)
+        return callback(new BadRequestException('Requests without origin are not allowed'), false)
       }
 
       if (allowedOrigins.includes(origin)) {
@@ -32,7 +32,7 @@ const configureCors = (app: INestApplication, allowedOrigins: string[], environm
       }
 
       logger.error(`Solicitud CORS rechazada desde origen: ${origin}`)
-      return callback(new BadRequestException('No permitido por CORS, origen no permitido'), false)
+      return callback(new BadRequestException('Not allowed by CORS, origin not allowed'), false)
     },
     methods: ['POST'],
     credentials: true,

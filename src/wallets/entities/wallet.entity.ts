@@ -1,15 +1,35 @@
-import { ClientEntity } from '../../users/entities/user.entity';
+import { Column, Model, Table, DataType, ForeignKey, BelongsTo } from 'sequelize-typescript';
+import { User } from '../../users/entities/user.entity';
 
-export class WalletEntity {
-  id: number;
+@Table({
+  tableName: 'wallets',
+  timestamps: true,
+  modelName: 'Wallet',
+  paranoid: true,
+})
+export class Wallet extends Model<Wallet> {
+  @Column({
+    type: DataType.INTEGER,
+    primaryKey: true,
+    autoIncrement: true,
+  })
+  declare id: number;
+
+  @Column({
+    type: DataType.DECIMAL(10, 2),
+    allowNull: false,
+    defaultValue: 0.00,
+  })
   balance: number;
-  clientDocument: string;
-  createdAt: Date;
-  updatedAt: Date;
 
-  client?: ClientEntity;
+  @ForeignKey(() => User)
+  @Column({
+    type: DataType.STRING(20),
+    allowNull: false,
+    unique: true
+  })
+  userDocument: string;
 
-  constructor(partial: Partial<WalletEntity>) {
-    Object.assign(this, partial);
-  }
+  @BelongsTo(() => User)
+  user: User;
 }

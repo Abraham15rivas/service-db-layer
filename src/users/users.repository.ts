@@ -1,31 +1,31 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
-import { Sequelize } from 'sequelize-typescript';
-import { ClientModel } from './models/client.model';
-import { WalletModel } from '../wallets/models/wallet.model';
+import { User } from './entities/user.entity';
 import { CreateUserDto } from './dto/create-user.dto';
+import { Transaction } from 'sequelize';
+
 
 @Injectable()
 export class UsersRepository {
   constructor(
-    @InjectModel(ClientModel) private readonly clientModel: typeof ClientModel,
+    @InjectModel(User) private readonly user: typeof User
   ) {}
 
-  /**
-   *
-   * @param criteria Objeto con los criterios de búsqueda.
-   */
-  async findClientByCriteria(criteria: any): Promise<ClientModel | null> {
-    return this.clientModel.findOne({
-        where: criteria,
-        include: [WalletModel]
+  async findByEmail(email: string): Promise<User | null> {
+    return await this.user.findOne({
+      where: {
+        email
+      },
+      attributes: {
+        exclude: ['createdAt', 'updatedAt', 'deletedAt']
+      },
+      raw: true
     });
   }
 
-  async createClient(createDto: CreateUserDto): Promise<ClientModel> {
-
+  async createUser(createDto: CreateUserDto, transaction?: Transaction): Promise<User> {
     try {
-      return this.clientModel.create(createDto as any);
+      return this.user.create(createDto as any,  { transaction: transaction });
     } catch (error) {
       throw error;
     }

@@ -1,21 +1,15 @@
 import { Injectable } from '@nestjs/common';
 import { CreateWalletDto } from './dto/create-wallet.dto';
+import { WalletRepository } from './wallet.repository';
+import { Transaction } from 'sequelize';
 
 @Injectable()
 export class WalletsService {
-  create(createWalletDto: CreateWalletDto) {
-    return 'This action adds a new wallet';
-  }
+	constructor(
+		private readonly walletRepository: WalletRepository
+	) {}
 
-  findAll() {
-    return `This action returns all wallets`;
-  }
-
-  findOne(id: number) {
-    return `This action returns a #${id} wallet`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} wallet`;
+  async create(createWalletDto: CreateWalletDto, transaction?: Transaction) {
+		return await this.walletRepository.createInitialWallet(createWalletDto, transaction);
   }
 }

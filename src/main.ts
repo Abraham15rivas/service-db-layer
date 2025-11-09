@@ -1,6 +1,7 @@
 import { NestFactory } from '@nestjs/core';
 import { ConfigService } from '@nestjs/config';
-import { Logger } from '@nestjs/common';
+import { Logger, ValidationPipe } from '@nestjs/common';
+import { HttpExceptionFilter } from './shared/filters/http-exception.filter';
 import { AppModule } from './app.module';
 import configureCors from '../config/cors.config';
 import getServerIp from '../config/server.config';
@@ -13,12 +14,22 @@ async function bootstrap() {
       logger: ['error', 'warn', 'log', 'debug', 'verbose']
     })
 
+
     const configService = app.get(ConfigService)
     const environment   = configService.get('app.environment')
 
     const { port, prefix, allowedOrigins } = configService.get('app.server')
 
     app.setGlobalPrefix(prefix)
+    app.useGlobalFilters(new HttpExceptionFilter());
+    app.useGlobalPipes(
+        new ValidationPipe({
+            whitelist: true,
+            forbidNonWhitelisted: true,
+            transform: true
+        })
+    )
+
     configureCors(app, allowedOrigins, environment)
 
     const serverIp = getServerIp(environment)
