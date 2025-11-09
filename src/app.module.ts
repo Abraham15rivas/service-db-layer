@@ -3,19 +3,23 @@ import { ConfigModule } from '@nestjs/config';
 import { envSchema } from 'config/env-schema.config';
 import { UsersModule } from './users/users.module';
 import { DatabaseModule } from './shared/db/database.module';
+import { WalletsModule } from './wallets/wallets.module';
+import { AuthModule } from './auth/auth.module';
 import appConfig from '../config/app.config';
 import databaseConfig from '../config/database.config';
+import jwtConfig from 'config/jwt.config';
 
 @Module({
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
-      envFilePath: `env/${process.env.NODE_ENV || 'development'}.env`,
-      load: [appConfig, databaseConfig],
+      load: [appConfig, databaseConfig, jwtConfig],
       validationSchema: envSchema
     }),
     DatabaseModule,
-    UsersModule
+    UsersModule,
+    WalletsModule,
+    AuthModule
   ]
 })
 export class AppModule {}

@@ -1,26 +1,35 @@
 import { Injectable } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
-import { UpdateUserDto } from './dto/update-user.dto';
+import { UsersRepository } from './users.repository';
+import { WalletsService } from 'src/wallets/wallets.service';
+import { Sequelize } from 'sequelize-typescript';
 
 @Injectable()
 export class UsersService {
-  create(createUserDto: CreateUserDto) {
-    return 'This action adds a new user';
+  constructor(
+    private readonly usersRepository: UsersRepository,
+    private readonly walletService: WalletsService,
+    private readonly sequelize: Sequelize,
+  ) {}
+
+  async create(createUserDto: CreateUserDto) {
+    const t = await this.sequelize.transaction();
+
+    try {
+      const user = await this.usersRepository.createUser(createUserDto, t);
+
+      await this.walletService.create({ userDocument: user.document }, t);
+
+      await t.commit();
+
+      return user;
+    } catch (error) {
+      await t.rollback();
+      throw error;
+    }
   }
 
-  findAll() {
-    return `This action returns all users`;
-  }
-
-  findOne(id: number) {
-    return `This action returns a #${id} user`;
-  }
-
-  update(id: number, updateUserDto: UpdateUserDto) {
-    return `This action updates a #${id} user`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} user`;
+  async findOneByEmail(email: string) {
+    return await this.usersRepository.findByEmail(email);
   }
 }
