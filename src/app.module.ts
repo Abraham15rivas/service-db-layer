@@ -17,9 +17,9 @@ import jwtConfig from 'config/jwt.config';
       validationSchema: envSchema
     }),
     DatabaseModule,
+    AuthModule,
     UsersModule,
-    WalletsModule,
-    AuthModule
+    WalletsModule
   ]
 })
 export class AppModule {}
