@@ -11,6 +11,15 @@ export class WalletsRepository {
     private readonly wallet: typeof Wallet
   ) {}
 
+  async getBalanceWallet(userDocument: string) {
+    return this.wallet.findOne({
+      where: {
+        userDocument: userDocument
+      },
+      attributes: ['id', 'balance']
+    })
+  }
+
   async createInitialWallet(createWalletDto: CreateWalletDto, transaction?: Transaction): Promise<Wallet> {
     const walletData = {
       userDocument: createWalletDto.userDocument,
