@@ -1,8 +1,9 @@
-import { Controller, Post, Body, Patch, UseGuards, HttpStatus, Param } from '@nestjs/common';
+import { Controller, Post, Body, Patch, UseGuards, HttpStatus, Param, Get } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { AuthGuard } from '../auth/guards/auth.guard';
 import { ResponseDto } from '../shared/dto/response.dto';
 import { TopUpWalletDto } from '../wallets/dto/top-up-wallet.dto';
+import { BalanceWalletDto } from '../wallets/dto/balance-wallet.dto';
 import { StartPaymentDto } from './dto/start-payment.dto';
 import { CheckPaymentDto } from './dto/check-payment.dto';
 
@@ -46,6 +47,17 @@ export class UsersController {
       statusCode: HttpStatus.CREATED,
       message: `Payment confirmed successfully. They were discounted ${confirmedPurchase?.amount} from your wallet.`,
       data: confirmedPurchase
+    };
+  }
+
+  @Get('balance')
+  async getBalance(@Body() balanceWalletDto: BalanceWalletDto): Promise<ResponseDto> {
+    const balanceWallet = await this.usersService.getBalance(balanceWalletDto)
+
+    return {
+      statusCode: HttpStatus.OK,
+      message: `Balance of wallet`,
+      data: balanceWallet
     };
   }
 }

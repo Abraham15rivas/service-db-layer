@@ -9,6 +9,7 @@ import { PurchasesService } from 'src/purchases/purchases.service';
 import { EmailService } from 'src/email/email.service';
 import { CheckPaymentDto } from './dto/check-payment.dto';
 import { PurchaseStatus } from '../purchases/entities/purchase.entity';
+import { BalanceWalletDto } from 'src/wallets/dto/balance-wallet.dto';
 
 @Injectable()
 export class UsersService {
@@ -49,6 +50,16 @@ export class UsersService {
     }
 
     return await this.walletsService.topUp(topUpDto);
+  }
+
+   async getBalance(balanceWalletDto: BalanceWalletDto) {
+    const user = this.usersRepository.findByDocumentAndPhone(balanceWalletDto.document, balanceWalletDto.phone);
+
+    if (!user) {
+      throw new NotFoundException(`User not found with document: ${balanceWalletDto.document} and phone: ${balanceWalletDto.phone}`);
+    }
+
+    return await this.walletsService.getBalance(balanceWalletDto.document)
   }
 
   async startPayment(document: string, startPayment: StartPaymentDto) {

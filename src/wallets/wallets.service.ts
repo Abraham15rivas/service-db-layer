@@ -17,6 +17,10 @@ export class WalletsService {
 		return await this.walletsRepository.createInitialWallet(createWalletDto, transaction);
   }
 
+  async getBalance(document: string) {
+    return await this.walletsRepository.getBalanceWallet(document)
+  }
+
   async topUp(topUpDto: TopUpWalletDto) {
     const t = await this.sequelize.transaction();
 
