@@ -11,6 +11,15 @@ export class WalletsRepository {
     private readonly wallet: typeof Wallet
   ) {}
 
+  async getBalanceWallet(userDocument: string) {
+    return this.wallet.findOne({
+      where: {
+        userDocument: userDocument
+      },
+      attributes: ['id', 'balance']
+    })
+  }
+
   async createInitialWallet(createWalletDto: CreateWalletDto, transaction?: Transaction): Promise<Wallet> {
     const walletData = {
       userDocument: createWalletDto.userDocument,
@@ -36,7 +45,9 @@ export class WalletsRepository {
     }
 
     const currentBalance  = parseFloat(walletUpdate.balance as any);
-    const newBalance      = currentBalance + amountChange;
+    const rawNewBalance   = currentBalance + amountChange;
+
+    const newBalance = Math.round(rawNewBalance * 100) / 100;
 
     if (newBalance < 0) {
       throw new BadRequestException('Operation aborted: Insufficient balance.');
@@ -47,6 +58,7 @@ export class WalletsRepository {
     try {
       return await walletUpdate.save({ transaction: t });
     } catch (error) {
+      console.log(error);
       throw new InternalServerErrorException('Database error during balance update.');
     }
   }

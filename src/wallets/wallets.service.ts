@@ -1,9 +1,10 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateWalletDto } from './dto/create-wallet.dto';
-import { TopUpWalletDto } from './dto/topup-wallet.dto';
+import { TopUpWalletDto } from './dto/top-up-wallet.dto';
 import { WalletsRepository } from './wallets.repository';
 import { Sequelize } from 'sequelize-typescript';
 import { Transaction } from 'sequelize';
+import { DeductWalletDto } from './dto/deduct-wallet.dto';
 
 @Injectable()
 export class WalletsService {
@@ -14,6 +15,10 @@ export class WalletsService {
 
   async create(createWalletDto: CreateWalletDto, transaction?: Transaction) {
 		return await this.walletsRepository.createInitialWallet(createWalletDto, transaction);
+  }
+
+  async getBalance(document: string) {
+    return await this.walletsRepository.getBalanceWallet(document)
   }
 
   async topUp(topUpDto: TopUpWalletDto) {
@@ -38,4 +43,29 @@ export class WalletsService {
       throw error;
     }
   }
+
+	async deduct(deductDto: DeductWalletDto) {
+		const t = await this.sequelize.transaction();
+
+    try {
+			const amountToDebit = -Math.abs(deductDto.amount)
+
+      const updatedWallet = await this.walletsRepository.updateBalanceInTransaction(
+        deductDto.document,
+        amountToDebit,
+        t
+      );
+
+      if (!updatedWallet) {
+        throw new NotFoundException(`Wallet not found with document: ${deductDto.document}`);
+      }
+
+      await t.commit();
+
+      return updatedWallet;
+    } catch (error) {
+      await t.rollback();
+      throw error;
+    }
+	}
 }
