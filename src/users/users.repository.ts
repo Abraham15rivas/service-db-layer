@@ -4,11 +4,11 @@ import { User } from './entities/user.entity';
 import { CreateUserDto } from './dto/create-user.dto';
 import { Transaction } from 'sequelize';
 
-
 @Injectable()
 export class UsersRepository {
   constructor(
-    @InjectModel(User) private readonly user: typeof User
+    @InjectModel(User)
+    private readonly user: typeof User
   ) {}
 
   async findByEmail(email: string): Promise<User | null> {
@@ -29,5 +29,16 @@ export class UsersRepository {
     } catch (error) {
       throw error;
     }
+  }
+
+  async findByDocumentAndPhone(document: string, phone: string): Promise<User | null> {
+    return await this.user.findOne({
+      where: {
+        document,
+        phone
+      },
+      attributes: ['email', 'document'],
+      raw: true
+    });
   }
 }

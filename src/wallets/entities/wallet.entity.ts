@@ -20,7 +20,7 @@ export class Wallet extends Model<Wallet> {
     allowNull: false,
     defaultValue: 0.00,
   })
-  balance: number;
+  declare balance: number;
 
   @ForeignKey(() => User)
   @Column({
@@ -28,7 +28,7 @@ export class Wallet extends Model<Wallet> {
     allowNull: false,
     unique: true
   })
-  userDocument: string;
+  declare userDocument: string;
 
   @BelongsTo(() => User)
   user: User;
