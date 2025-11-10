@@ -1,21 +1,41 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateWalletDto } from './dto/create-wallet.dto';
+import { TopUpWalletDto } from './dto/topup-wallet.dto';
+import { WalletsRepository } from './wallets.repository';
+import { Sequelize } from 'sequelize-typescript';
+import { Transaction } from 'sequelize';
 
 @Injectable()
 export class WalletsService {
-  create(createWalletDto: CreateWalletDto) {
-    return 'This action adds a new wallet';
+	constructor(
+    private readonly sequelize: Sequelize,
+		private readonly walletsRepository: WalletsRepository,
+	) {}
+
+  async create(createWalletDto: CreateWalletDto, transaction?: Transaction) {
+		return await this.walletsRepository.createInitialWallet(createWalletDto, transaction);
   }
 
-  findAll() {
-    return `This action returns all wallets`;
-  }
+  async topUp(topUpDto: TopUpWalletDto) {
+    const t = await this.sequelize.transaction();
 
-  findOne(id: number) {
-    return `This action returns a #${id} wallet`;
-  }
+    try {
+      const updatedWallet = await this.walletsRepository.updateBalanceInTransaction(
+        topUpDto.document,
+        topUpDto.amount,
+        t
+      );
 
-  remove(id: number) {
-    return `This action removes a #${id} wallet`;
+      if (!updatedWallet) {
+        throw new NotFoundException(`Wallet not found with document: ${topUpDto.document} and phone: ${topUpDto.phone}`);
+      }
+
+      await t.commit();
+
+      return updatedWallet;
+    } catch (error) {
+      await t.rollback();
+      throw error;
+    }
   }
 }

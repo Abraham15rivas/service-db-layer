@@ -1,34 +1,25 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, UseGuards, HttpStatus } from '@nestjs/common';
 import { UsersService } from './users.service';
-import { CreateUserDto } from './dto/create-user.dto';
-import { UpdateUserDto } from './dto/update-user.dto';
+import { AuthGuard } from '../auth/guards/auth.guard';
+import { ResponseDto } from '../shared/dto/response.dto';
+import { TopUpWalletDto } from '../wallets/dto/topup-wallet.dto';
 
 @Controller('users')
+@UseGuards(AuthGuard)
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
-  @Post()
-  create(@Body() createUserDto: CreateUserDto) {
-    return this.usersService.create(createUserDto);
-  }
+  @Post('top-up')
+  async topUp(@Body() topUpDto: TopUpWalletDto): Promise<ResponseDto> {
+    const wallet = await this.usersService.topUpWallet(topUpDto);
 
-  @Get()
-  findAll() {
-    return this.usersService.findAll();
-  }
-
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.usersService.findOne(+id);
-  }
-
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
-    return this.usersService.update(+id, updateUserDto);
-  }
-
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.usersService.remove(+id);
+    return {
+      statusCode: HttpStatus.OK,
+      message: 'Wallet top-up successful.',
+      data: {
+        document: wallet.userDocument,
+        newBalance: wallet.balance
+      }
+    };
   }
 }

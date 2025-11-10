@@ -1,17 +1,20 @@
 import { Module } from '@nestjs/common';
 import { SequelizeModule } from '@nestjs/sequelize';
-import { WalletModel } from './models/wallet.model';
+import { Wallet } from './entities/wallet.entity';
 import { WalletsService } from './wallets.service';
-import { WalletsController } from './wallets.controller';
-import { WalletRepository } from './wallet.repository';
+import { WalletsRepository } from './wallets.repository';
 
 @Module({
   imports: [
-    SequelizeModule.forFeature([WalletModel]),
-    WalletsModule
+    SequelizeModule.forFeature([Wallet])
   ],
-  controllers: [WalletsController],
-  providers: [WalletsService, WalletRepository],
-  exports: [WalletRepository]
+  providers: [
+    WalletsService,
+    WalletsRepository
+  ],
+  exports: [
+    WalletsService,
+    WalletsRepository
+  ]
 })
 export class WalletsModule {}
