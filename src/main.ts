@@ -14,7 +14,6 @@ async function bootstrap() {
       logger: ['error', 'warn', 'log', 'debug', 'verbose']
     })
 
-
     const configService = app.get(ConfigService)
     const environment   = configService.get('app.environment')
 

@@ -5,6 +5,8 @@ import { UsersModule } from './users/users.module';
 import { DatabaseModule } from './shared/db/database.module';
 import { WalletsModule } from './wallets/wallets.module';
 import { AuthModule } from './auth/auth.module';
+import { PurchasesModule } from './purchases/purchases.module';
+import { EmailModule } from './email/email.module';
 import appConfig from '../config/app.config';
 import databaseConfig from '../config/database.config';
 import jwtConfig from 'config/jwt.config';
@@ -19,7 +21,9 @@ import jwtConfig from 'config/jwt.config';
     DatabaseModule,
     AuthModule,
     UsersModule,
-    WalletsModule
+    WalletsModule,
+    PurchasesModule,
+    EmailModule
   ]
 })
 export class AppModule {}

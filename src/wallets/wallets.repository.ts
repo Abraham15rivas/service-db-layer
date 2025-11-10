@@ -36,7 +36,9 @@ export class WalletsRepository {
     }
 
     const currentBalance  = parseFloat(walletUpdate.balance as any);
-    const newBalance      = currentBalance + amountChange;
+    const rawNewBalance   = currentBalance + amountChange;
+
+    const newBalance = Math.round(rawNewBalance * 100) / 100;
 
     if (newBalance < 0) {
       throw new BadRequestException('Operation aborted: Insufficient balance.');
@@ -47,6 +49,7 @@ export class WalletsRepository {
     try {
       return await walletUpdate.save({ transaction: t });
     } catch (error) {
+      console.log(error);
       throw new InternalServerErrorException('Database error during balance update.');
     }
   }
