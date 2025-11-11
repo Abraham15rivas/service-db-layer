@@ -10,6 +10,7 @@ import { EmailService } from 'src/email/email.service';
 import { CheckPaymentDto } from './dto/check-payment.dto';
 import { PurchaseStatus } from '../purchases/entities/purchase.entity';
 import { BalanceWalletDto } from 'src/wallets/dto/balance-wallet.dto';
+import { SendEmailDto } from 'src/email/dto/send-email.dto';
 
 @Injectable()
 export class UsersService {
@@ -43,7 +44,7 @@ export class UsersService {
   }
 
   async topUpWallet(topUpDto: TopUpWalletDto) {
-    const user = this.usersRepository.findByDocumentAndPhone(topUpDto.document, topUpDto.phone);
+    const user = await this.usersRepository.findByDocumentAndPhone(topUpDto.document, topUpDto.phone);
 
     if (!user) {
       throw new NotFoundException(`User not found with document: ${topUpDto.document} and phone: ${topUpDto.phone}`);
@@ -53,7 +54,7 @@ export class UsersService {
   }
 
    async getBalance(balanceWalletDto: BalanceWalletDto) {
-    const user = this.usersRepository.findByDocumentAndPhone(balanceWalletDto.document, balanceWalletDto.phone);
+    const user = await this.usersRepository.findByDocumentAndPhone(balanceWalletDto.document, balanceWalletDto.phone);
 
     if (!user) {
       throw new NotFoundException(`User not found with document: ${balanceWalletDto.document} and phone: ${balanceWalletDto.phone}`);
@@ -66,7 +67,7 @@ export class UsersService {
     const purchase = await this.purchasesService.findByIdAndDocument(startPayment.purchaseId, document)
 
     try {
-        const userEmail       = purchase && purchase['user.email']
+        const recipientEmail  = purchase && purchase['user.email']
         const token           = Math.floor(100000 + Math.random() * 900000).toString();
         const expirationTime  = new Date(Date.now() + 5 * 60000);
 
@@ -77,13 +78,14 @@ export class UsersService {
 
         await this.purchasesService.update(startPayment.purchaseId, purchaseData);
 
-        const sesionId = (purchase ? purchase.id : 1)
+        const sessionId = (purchase ? purchase.id : 1)
+        const dataEmail: SendEmailDto = {
+            recipientEmail,
+            token,
+            sessionId
+        }
 
-        await this.emailService.sendToken(
-          userEmail,
-          token,
-          sesionId
-        )
+        await this.emailService.sendConfirmationEmail(dataEmail)
 
         return {
           purchaseId: purchase?.id,

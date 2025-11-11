@@ -6,6 +6,7 @@ import { TopUpWalletDto } from '../wallets/dto/top-up-wallet.dto';
 import { BalanceWalletDto } from '../wallets/dto/balance-wallet.dto';
 import { StartPaymentDto } from './dto/start-payment.dto';
 import { CheckPaymentDto } from './dto/check-payment.dto';
+import { IsOwnerGuard } from 'src/auth/guards/owner.guard';
 
 @Controller('users')
 @UseGuards(AuthGuard)
@@ -15,6 +16,7 @@ export class UsersController {
 ) {}
 
   @Post('top-up')
+  @UseGuards(IsOwnerGuard)
   async topUp(@Body() topUpDto: TopUpWalletDto): Promise<ResponseDto> {
     const wallet = await this.usersService.topUpWallet(topUpDto);
 
@@ -51,6 +53,7 @@ export class UsersController {
   }
 
   @Post('balance')
+  @UseGuards(IsOwnerGuard)
   async getBalance(@Body() balanceWalletDto: BalanceWalletDto): Promise<ResponseDto> {
     const balanceWallet = await this.usersService.getBalance(balanceWalletDto)
 
