@@ -1,4 +1,4 @@
-import { Controller, Post, Body, Patch, UseGuards, HttpStatus, Param, Get } from '@nestjs/common';
+import { Controller, Post, Body, Patch, UseGuards, HttpStatus, Param } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { AuthGuard } from '../auth/guards/auth.guard';
 import { ResponseDto } from '../shared/dto/response.dto';
@@ -50,7 +50,7 @@ export class UsersController {
     };
   }
 
-  @Get('balance')
+  @Post('balance')
   async getBalance(@Body() balanceWalletDto: BalanceWalletDto): Promise<ResponseDto> {
     const balanceWallet = await this.usersService.getBalance(balanceWalletDto)
 

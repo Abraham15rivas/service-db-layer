@@ -20,7 +20,7 @@ export class RegisterDto {
 
   @IsString()
   @IsNotEmpty()
-  @Matches(/^\d{10}$/, { message: 'Phone must be a 10-digit number.' })
+  @Matches(/^\d{11}$/, { message: 'Phone must be a 10-digit number.' })
   phone: string;
 
   @IsString()
