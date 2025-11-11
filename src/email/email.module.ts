@@ -5,12 +5,6 @@ import { join } from 'path';
 import { EmailService } from './email.service';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 
-const isDev = process.env.NODE_ENV !== 'production';
-const templateDir = isDev
-  ? join(process.cwd(), 'src', 'email', 'templates')
-  : join(__dirname, 'templates');
-
-
 @Module({
   imports: [
     MailerModule.forRootAsync({
@@ -28,7 +22,7 @@ const templateDir = isDev
           from: `"No Reply" <${configService.get('mail.from')}>`
         },
         template: {
-          dir: templateDir,
+          dir: join(__dirname, '..', '..', 'email', 'templates'),
           adapter: new HandlebarsAdapter(),
           options: {
             strict: true
