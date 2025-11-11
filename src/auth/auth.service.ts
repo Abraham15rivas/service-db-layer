@@ -50,10 +50,12 @@ export class AuthService {
 
     return {
       access_token: token,
-      email: user.email,
-      document: user.document,
-      names: user.names,
-      phone: user.phone
+      user: {
+        email: user.email,
+        document: user.document,
+        names: user.names,
+        phone: user.phone
+      }
     }
   }
 }

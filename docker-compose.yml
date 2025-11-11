@@ -1,0 +1,74 @@
+version: '3.8'
+
+services:
+  # -----------------------------------------------------------------
+  # 1. BASE DE DATOS MYSQL
+  # -----------------------------------------------------------------
+  mysql-db:
+    image: mysql:8.0
+    container_name: mysql-db
+    restart: always
+    ports:
+      - "3306:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: 123456
+      MYSQL_DATABASE: walletdb
+    volumes:
+      - db_data:/var/lib/mysql
+
+  # -----------------------------------------------------------------
+  # 2. SERVICIO DB (NestJS - service-db-layer)
+  #    Es el único que toca la DB (REST de BD).
+  # -----------------------------------------------------------------
+  service-db-layer:
+    # 💡 AJUSTE DE RUTA: Asume que el código de NestJS está en la raíz (./)
+    build:
+      context: ./
+      dockerfile: Dockerfile
+    container_name: service-db-layer
+    restart: always
+    ports:
+      - "3000:3000"
+    environment:
+      DB_HOST: mysql-db
+      DB_USER: root
+      DB_PASSWORD: 123456
+      DB_NAME: walletdb
+      SERVER_PORT: 3000
+    depends_on:
+      - mysql-db
+
+  # -----------------------------------------------------------------
+  # 3. API GATEWAY (Express - api-gateway)
+  #    Es el Puente/Fachada (REST 2) que consume el REST de BD (service-db-layer).
+  # -----------------------------------------------------------------
+  api-gateway:
+    build:
+      context: ../api-gateway
+      dockerfile: Dockerfile
+    container_name: api-gateway
+    restart: always
+    ports:
+      - "4000:4000"
+    environment:
+      GATEWAY_PORT: 4000
+      NESTJS_APP_URL: http://service-db-layer:3000
+    depends_on:
+      - service-db-layer # Espera a que la API de DB esté lista
+
+  # -----------------------------------------------------------------
+  # 4. CLIENTE WEB (React/Vite - wallet-client)
+  #    Solo para referencia, consunmirá el puerto 4000.
+  # -----------------------------------------------------------------
+  # wallet-client:
+  #   build:
+  #     context: ./wallet-client
+  #     dockerfile: Dockerfile
+  #   container_name: wallet-client
+  #   ports:
+  #     - "8080:80"
+  #   depends_on:
+  #     - api-gateway
+
+volumes:
+  db_data:

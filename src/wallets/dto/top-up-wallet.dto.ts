@@ -4,7 +4,7 @@ import { Type } from 'class-transformer';
 export class TopUpWalletDto {
   @IsString()
   @IsNotEmpty()
-  @Matches(/^\d{10}$/, { message: 'Phone must be a 10-digit number.' })
+  @Matches(/^\d{11}$/, { message: 'Phone must be a 11-digit number.' })
   phone: string;
 
   @IsNotEmpty()
