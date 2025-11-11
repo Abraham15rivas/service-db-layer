@@ -10,12 +10,13 @@ import { EmailModule } from './email/email.module';
 import appConfig from '../config/app.config';
 import databaseConfig from '../config/database.config';
 import jwtConfig from 'config/jwt.config';
+import mailConfig from 'config/mail.config';
 
 @Module({
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
-      load: [appConfig, databaseConfig, jwtConfig],
+      load: [appConfig, databaseConfig, jwtConfig, mailConfig],
       validationSchema: envSchema
     }),
     DatabaseModule,

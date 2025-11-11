@@ -1,28 +1,29 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable, InternalServerErrorException } from '@nestjs/common';
+import { MailerService } from '@nestjs-modules/mailer';
+import { SendEmailDto } from './dto/send-email.dto';
 
 @Injectable()
 export class EmailService {
-  private readonly logger = new Logger(EmailService.name);
+  constructor(private mailerService: MailerService) {}
 
-  async sendToken(recipientEmail: string, token: string, sessionId: number): Promise<void> {
-    this.logger.log(`
-      ======================================================
-      ✅ EMAIL SENT SUCCESSFULLY (SIMULATION) ✅
-      To: ${recipientEmail}
-      Subject: Your Purchase Confirmation Token
+  async sendConfirmationEmail(sendEmailDto: SendEmailDto) {
+    try {
+      await this.mailerService.sendMail({
+        to: sendEmailDto.recipientEmail,
+        subject: '🔒 Tu Token de Confirmación de Compra',
+        template: 'email-confirmation',
+        context: {
+          params: {
+            token: sendEmailDto.token,
+            sessionId: sendEmailDto.sessionId,
+          },
+        },
+      });
+      console.log(`Correo de confirmación enviado a: ${sendEmailDto.recipientEmail}`);
 
-      Hello,
-
-      Your purchase request has been initiated.
-      Please use the following details to confirm your payment:
-
-      - Confirmation Token: **${token}**
-      - Purchase ID (Session ID): **${sessionId}**
-
-      This token is valid for 5 minutes.
-      ======================================================
-    `);
-
-    return;
+    } catch (error) {
+      console.error('Error al enviar el correo:', error);
+      throw new InternalServerErrorException('Error al enviar el correo de confirmación.');
+    }
   }
 }

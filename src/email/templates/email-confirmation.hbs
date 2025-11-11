@@ -1,0 +1,60 @@
+<table border="0" cellpadding="0" cellspacing="0" width="100%">
+    <tr>
+        <td style="padding: 20px 0 30px 0;">
+            <table align="center" border="0" cellpadding="0" cellspacing="0" width="600" style="border-collapse: collapse; background-color: #ffffff; border-radius: 8px; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);">
+
+                <!-- Header -->
+                <tr>
+                    <td align="center" bgcolor="#007bff" style="padding: 30px 20px; border-radius: 8px 8px 0 0; color: #ffffff;">
+                        <h1 style="margin: 0; font-size: 24px;">Confirmación de Compra</h1>
+                    </td>
+                </tr>
+
+                <!-- Body Content -->
+                <tr>
+                    <td style="padding: 40px 30px 40px 30px;">
+                        <p style="margin: 0 0 20px 0; font-size: 16px; color: #333333;">
+                            Hola,
+                        </p>
+                        <p style="margin: 0 0 20px 0; font-size: 16px; color: #333333;">
+                            Tu solicitud de compra ha sido iniciada.
+                            Por favor, utiliza los siguientes detalles para **confirmar tu pago**:
+                        </p>
+
+                        <!-- Token Box -->
+                        <table border="0" cellpadding="0" cellspacing="0" width="100%" style="border-collapse: collapse; margin-bottom: 25px; border: 1px solid #e0e0e0; border-radius: 6px;">
+                            <tr>
+                                <td align="center" style="padding: 25px; background-color: #f9f9f9;">
+                                    <p style="margin: 0 0 10px 0; font-size: 14px; color: #555555;">Token de Confirmación:</p>
+                                    <div style="font-size: 32px; font-weight: bold; color: #007bff; letter-spacing: 5px; background-color: #eaf5ff; padding: 10px 20px; border-radius: 4px; display: inline-block;">
+                                        {{params.token}}
+                                    </div>
+                                </td>
+                            </tr>
+                        </table>
+
+                        <!-- Details -->
+                        <p style="margin: 0 0 10px 0; font-size: 16px; color: #333333;">
+                            **ID de Compra (Session ID):** {{params.sessionId}}
+                        </p>
+                        <p style="margin: 0 0 25px 0; font-size: 14px; color: #dc3545; font-weight: bold;">
+                            Este token es válido por 5 minutos.
+                        </p>
+
+                        <p style="margin: 0; font-size: 16px; color: #333333;">
+                            Si tienes alguna pregunta, no dudes en contactarnos.
+                        </p>
+                    </td>
+                </tr>
+
+                <!-- Footer -->
+                <tr>
+                    <td bgcolor="#eeeeee" align="center" style="padding: 20px 30px; border-radius: 0 0 8px 8px; font-size: 12px; color: #777777;">
+                        © 2025 Tu Empresa. Todos los derechos reservados.
+                    </td>
+                </tr>
+
+            </table>
+        </td>
+    </tr>
+</table>
