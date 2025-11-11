@@ -18,10 +18,8 @@ services:
 
   # -----------------------------------------------------------------
   # 2. SERVICIO DB (NestJS - service-db-layer)
-  #    Es el único que toca la DB (REST de BD).
   # -----------------------------------------------------------------
   service-db-layer:
-    # 💡 AJUSTE DE RUTA: Asume que el código de NestJS está en la raíz (./)
     build:
       context: ./
       dockerfile: Dockerfile
@@ -30,17 +28,32 @@ services:
     ports:
       - "3000:3000"
     environment:
-      DB_HOST: mysql-db
-      DB_USER: root
-      DB_PASSWORD: 123456
-      DB_NAME: walletdb
+      NODE_ENV: development
+      PREFIX: api/v1
       SERVER_PORT: 3000
+      DB_CONNECTION: mysql
+      DB_HOST: mysql-db
+      DB_PORT: 3306
+      DB_DATABASE: walletdb
+      DB_USERNAME: root
+      DB_PASSWORD: 123456
+      DB_SSL: false
+      DB_AUTO_LOAD_MODELS: true
+      DB_SYNCHRONIZE: false
+      DB_LOGGING: false
+      ALLOWED_ORIGINS: http://api-gateway:4000
+      JWT_SECRET: c3Ryb25nLXNlY3JldC1mb3ItZGV2ZWxvcG1lbnQtMTIzNDU2Nzg5MA==
+      JWT_EXPIRES_IN: 1h
+      MAIL_PORT: 587
+      MAIL_HOST: sandbox.smtp.mailtrap.io
+      MAIL_USER: 49dc76c3cb41dc
+      MAIL_PASSWORD: 30cbd2d1d815ac
+      MAIL_FROM: noreply@example.com
     depends_on:
       - mysql-db
 
   # -----------------------------------------------------------------
   # 3. API GATEWAY (Express - api-gateway)
-  #    Es el Puente/Fachada (REST 2) que consume el REST de BD (service-db-layer).
   # -----------------------------------------------------------------
   api-gateway:
     build:
@@ -51,24 +64,28 @@ services:
     ports:
       - "4000:4000"
     environment:
-      GATEWAY_PORT: 4000
-      NESTJS_APP_URL: http://service-db-layer:3000
+      APP_GATEWAY_URL: http://api-gateway
+      APP_GATEWAY_PORT: 4000
+      APP_SERVICE_DB_LAYER_URL: http://service-db-layer:3000
+      APP_WALLET_CLIENT_URL: http://wallet-client:8080
+      ALLOWED_ORIGINS: http://wallet-client:8080,http://localhost:8080
     depends_on:
-      - service-db-layer # Espera a que la API de DB esté lista
+      - service-db-layer
 
   # -----------------------------------------------------------------
   # 4. CLIENTE WEB (React/Vite - wallet-client)
-  #    Solo para referencia, consunmirá el puerto 4000.
   # -----------------------------------------------------------------
-  # wallet-client:
-  #   build:
-  #     context: ./wallet-client
-  #     dockerfile: Dockerfile
-  #   container_name: wallet-client
-  #   ports:
-  #     - "8080:80"
-  #   depends_on:
-  #     - api-gateway
+  wallet-client:
+    build:
+      context: ../wallet-client
+      dockerfile: Dockerfile
+      args:
+        VITE_APP_API_GATEWAY_URL: http://api-gateway:4000/api/v1
+    container_name: wallet-client
+    ports:
+      - "8080:8080"
+    depends_on:
+      - api-gateway
 
 volumes:
   db_data:
